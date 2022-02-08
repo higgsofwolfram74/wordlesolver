@@ -1,8 +1,11 @@
 #![allow(dead_code, unused_imports, unused_variables)]
+use std::any::Any;
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 use std::io::BufReader;
+
+use crate::wordanalyzer::LettersManager;
 
 mod wordanalyzer;
 //TODO: When given a yellow letter, we know where that letter isn't. We could filter that too.
@@ -19,21 +22,56 @@ fn main() {
         .map(|x| x.unwrap().trim_end().to_string())
         .collect();
 
-    let lexicon: wordanalyzer::WordAnalyzer = wordanalyzer::WordAnalyzer::new(read);
+    let mut lexicon: wordanalyzer::WordAnalyzer = wordanalyzer::WordAnalyzer::new(read);
 
     println!("Welcome to my Wordle Solver!\nI appreciate you using my program :)\nPlease input the word \"weary\" and record the result.");
 
-    println!("Of the word weary, please put in any green letters in their place.\n Put a _ for any placeholders");
+    lexicon.filter_words(expect_input());
 
-    let mut letters = String::new();
+    println!("Please put in the word \"pious\" next.");
+
+    lexicon.filter_words(expect_input());
+
+    println!("Finding optimal word to guess...");
+
+    let mut possible_words: Vec<&String> = lexicon.words_to_try();
+    
+    for word in possible_words {
+        println!("{},", word);
+    }
+
+}
+
+fn expect_input() -> LettersManager{
+    let mut letters: String = String::new();
+    let mut found_letters: LettersManager = wordanalyzer::LettersManager::new();
+
+    println!("Please put in any green letters in their place.\n Put a _ for any placeholders");
 
     io::stdin()
         .read_line(&mut letters)
         .expect("Failed to read line.");
 
     while letters.len() != 5 {
-        println!()
+        println!("Input needs to be 5 letters");
+        io::stdin().read_line(&mut letters).expect("Failed to read line");
     }
+
+    found_letters.set_green(green_input(&letters));
+
+    println!("Please put in any yellow letters. (Order doesn't matter)");
+
+    io::stdin().read_line(&mut letters).expect("Failed to read line.");
+
+    found_letters.set_yellow(other_input(&letters));
+
+    println!("Please input all greyed out letters.");
+
+    io::stdin().read_line(&mut letters).expect("Failed to read line.");
+
+    found_letters.set_black(other_input(&letters));
+
+    found_letters
 }
 
 fn green_input(inp: &String) -> Vec<(usize, char)> {
