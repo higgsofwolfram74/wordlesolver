@@ -26,52 +26,61 @@ fn main() {
 
     println!("Welcome to my Wordle Solver!\nI appreciate you using my program :)\nPlease input the word \"weary\" and record the result.");
 
-    lexicon.filter_words(expect_input());
+    let mut letters: LettersManager = expect_input();
+    
+    lexicon.filter_words(letters);
 
     println!("Please put in the word \"pious\" next.");
 
-    lexicon.filter_words(expect_input());
+    letters = expect_input();
 
-    println!("Finding optimal word to guess...");
+    lexicon.filter_words(letters);
 
-    let mut possible_words: Vec<&String> = lexicon.words_to_try();
+    println!("Finding optimal words to guess...");
+
+    let possible_words: Vec<&String> = lexicon.words_to_try();
     
     for word in possible_words {
-        println!("{},", word);
+        print!("{} ", word);
     }
 
 }
 
 fn expect_input() -> LettersManager{
-    let mut letters: String = String::new();
     let mut found_letters: LettersManager = wordanalyzer::LettersManager::new();
 
     println!("Please put in any green letters in their place.\n Put a _ for any placeholders");
 
-    io::stdin()
-        .read_line(&mut letters)
-        .expect("Failed to read line.");
+    let mut letters = handle_input();
 
     while letters.len() != 5 {
-        println!("Input needs to be 5 letters");
-        io::stdin().read_line(&mut letters).expect("Failed to read line");
+        println!("Input needs to be 5 letters. Length was {}: {}", letters.len(), letters);
+        letters = handle_input();
     }
 
     found_letters.set_green(green_input(&letters));
 
     println!("Please put in any yellow letters. (Order doesn't matter)");
 
-    io::stdin().read_line(&mut letters).expect("Failed to read line.");
+    letters = handle_input();
 
     found_letters.set_yellow(other_input(&letters));
 
     println!("Please input all greyed out letters.");
 
-    io::stdin().read_line(&mut letters).expect("Failed to read line.");
+    letters = handle_input();
 
     found_letters.set_black(other_input(&letters));
 
     found_letters
+}
+
+fn handle_input() -> String {
+    let mut letters: String = String::new();
+
+    io::stdin().read_line(&mut letters).expect("Failed to read line");
+
+    letters.trim_end().to_string()
 }
 
 fn green_input(inp: &String) -> Vec<(usize, char)> {

@@ -53,8 +53,12 @@ impl WordAnalyzer {
         Self { words: wordlist }
     }
 
+    pub fn get_words(&self) -> &Vec<String> {
+        &self.words
+    }
+
     pub fn filter_words(&mut self, letters: LettersManager) -> () {
-        println!("Removing dead words...");
+        //println!("Removing dead words...");
 
         self.words
             .retain(|x| WordAnalyzer::word_checker(x, &letters));
@@ -109,5 +113,75 @@ impl WordAnalyzer {
         }
 
         return true;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn sanity_check() {
+        assert!(true);
+    }
+
+    #[test]
+    fn construction() {
+        let mocker: WordAnalyzer = WordAnalyzer {
+            words: vec!["hello", "there"].iter().map(|x| x.to_string()).collect(),
+        };
+
+        assert_eq!(&mocker.words, &vec!["hello".to_string(), "there".to_string()]);
+    }
+
+    #[test]
+    fn green_filterer() {
+        let mut mocker: WordAnalyzer = WordAnalyzer {
+            words: vec!["hello", "hithe", "where", "whate", "butte", "trees"].into_iter().map(|x| x.to_string()).collect(),
+        };
+
+        let letters: LettersManager = LettersManager {
+            g_letters: vec![(0, 'h')],
+            y_letters: Vec::new(),
+            b_letters: Vec::new(),
+        };
+
+        mocker.filter_words(letters);
+
+        assert_eq!(mocker.get_words(), &vec!["hello".to_string(), "hithe".to_string()])
+    }
+
+    #[test]
+    fn yellow_filterer() {
+        let mut mocker: WordAnalyzer = WordAnalyzer {
+            words: vec!["hello", "hithe", "where", "whate", "butte", "trees"].into_iter().map(|x| x.to_string()).collect(),
+        };
+
+        let letters: LettersManager = LettersManager {
+            g_letters: Vec::new(),
+            y_letters: vec!['w', 'h'],
+            b_letters: Vec::new(),
+        };
+
+        mocker.filter_words(letters);
+
+        assert_eq!(mocker.get_words(), &vec!["where".to_string(), "whate".to_string()])
+    }
+
+    #[test]
+    fn black_filterer() {
+        let mut mocker: WordAnalyzer = WordAnalyzer {
+            words: vec!["hello", "hithe", "where", "whate", "butte", "trees"].into_iter().map(|x| x.to_string()).collect(),
+        };
+
+        let letters: LettersManager = LettersManager {
+            g_letters: Vec::new(),
+            y_letters: Vec::new(),
+            b_letters: vec!['o', 'u', 'w'],
+        };
+
+        mocker.filter_words(letters);
+
+        assert_eq!(mocker.get_words(), &vec!["hithe".to_string(), "trees".to_string()])
     }
 }
