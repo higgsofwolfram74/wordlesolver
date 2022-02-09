@@ -1,5 +1,5 @@
+use rand::{prelude::SliceRandom, seq::IteratorRandom};
 use std::collections::HashMap;
-use rand::{seq::IteratorRandom, prelude::SliceRandom};
 
 pub struct WordAnalyzer {
     words: Vec<String>,
@@ -20,10 +20,7 @@ impl LettersManager {
         }
     }
 
-    pub fn set_green(
-        &mut self,
-        g_letters: Vec<(usize, char)>,
-    ) -> () {
+    pub fn set_green(&mut self, g_letters: Vec<(usize, char)>) -> () {
         self.g_letters = g_letters;
     }
 
@@ -87,8 +84,9 @@ impl WordAnalyzer {
 
         let mut rng = rand::thread_rng();
 
-        return self.words[slice.0..slice.1].choose_multiple(&mut rng, 5).collect();
-        
+        return self.words[slice.0..slice.1]
+            .choose_multiple(&mut rng, 5)
+            .collect();
     }
 
     fn word_checker(word: &String, letters: &LettersManager) -> bool {
@@ -128,16 +126,25 @@ mod tests {
     #[test]
     fn construction() {
         let mocker: WordAnalyzer = WordAnalyzer {
-            words: vec!["hello", "there"].iter().map(|x| x.to_string()).collect(),
+            words: vec!["hello", "there"]
+                .iter()
+                .map(|x| x.to_string())
+                .collect(),
         };
 
-        assert_eq!(&mocker.words, &vec!["hello".to_string(), "there".to_string()]);
+        assert_eq!(
+            &mocker.words,
+            &vec!["hello".to_string(), "there".to_string()]
+        );
     }
 
     #[test]
     fn green_filterer() {
         let mut mocker: WordAnalyzer = WordAnalyzer {
-            words: vec!["hello", "hithe", "where", "whate", "butte", "trees"].into_iter().map(|x| x.to_string()).collect(),
+            words: vec!["hello", "hithe", "where", "whate", "butte", "trees"]
+                .into_iter()
+                .map(|x| x.to_string())
+                .collect(),
         };
 
         let letters: LettersManager = LettersManager {
@@ -148,13 +155,19 @@ mod tests {
 
         mocker.filter_words(letters);
 
-        assert_eq!(mocker.get_words(), &vec!["hello".to_string(), "hithe".to_string()])
+        assert_eq!(
+            mocker.get_words(),
+            &vec!["hello".to_string(), "hithe".to_string()]
+        )
     }
 
     #[test]
     fn yellow_filterer() {
         let mut mocker: WordAnalyzer = WordAnalyzer {
-            words: vec!["hello", "hithe", "where", "whate", "butte", "trees"].into_iter().map(|x| x.to_string()).collect(),
+            words: vec!["hello", "hithe", "where", "whate", "butte", "trees"]
+                .into_iter()
+                .map(|x| x.to_string())
+                .collect(),
         };
 
         let letters: LettersManager = LettersManager {
@@ -165,13 +178,19 @@ mod tests {
 
         mocker.filter_words(letters);
 
-        assert_eq!(mocker.get_words(), &vec!["where".to_string(), "whate".to_string()])
+        assert_eq!(
+            mocker.get_words(),
+            &vec!["where".to_string(), "whate".to_string()]
+        )
     }
 
     #[test]
     fn black_filterer() {
         let mut mocker: WordAnalyzer = WordAnalyzer {
-            words: vec!["hello", "hithe", "where", "whate", "butte", "trees"].into_iter().map(|x| x.to_string()).collect(),
+            words: vec!["hello", "hithe", "where", "whate", "butte", "trees"]
+                .into_iter()
+                .map(|x| x.to_string())
+                .collect(),
         };
 
         let letters: LettersManager = LettersManager {
@@ -182,6 +201,9 @@ mod tests {
 
         mocker.filter_words(letters);
 
-        assert_eq!(mocker.get_words(), &vec!["hithe".to_string(), "trees".to_string()])
+        assert_eq!(
+            mocker.get_words(),
+            &vec!["hithe".to_string(), "trees".to_string()]
+        )
     }
 }

@@ -27,7 +27,7 @@ fn main() {
     println!("Welcome to my Wordle Solver!\nI appreciate you using my program :)\nPlease input the word \"weary\" and record the result.");
 
     let mut letters: LettersManager = expect_input();
-    
+
     lexicon.filter_words(letters);
 
     println!("Please put in the word \"pious\" next.");
@@ -39,14 +39,47 @@ fn main() {
     println!("Finding optimal words to guess...");
 
     let possible_words: Vec<&String> = lexicon.words_to_try();
-    
+
     for word in possible_words {
         print!("{} ", word);
     }
 
+
+
+    let mut i: u8 = 0;
+    let mut user_choice: bool = false;
+    while !user_choice && i < 5 {
+        println!("Please input a word and record results");
+        
+        letters = expect_input();
+
+        lexicon.filter_words(letters);
+
+        println!("Finding optimal words to guess");
+
+        let possible_words = lexicon.words_to_try();
+
+        for word in possible_words.into_iter() {
+            print!("{}", word);
+        }
+
+        println!("Has the word been solved?\n");
+
+        let mut stf: String = String::new();
+
+        io::stdin().read_line(&mut stf).expect("Failed to read line.");
+
+        match stf.to_lowercase().as_str() {
+            "y" => user_choice = true,
+            "n" => (),
+            _ => ()
+        };
+
+        i += 1;
+    }
 }
 
-fn expect_input() -> LettersManager{
+fn expect_input() -> LettersManager {
     let mut found_letters: LettersManager = wordanalyzer::LettersManager::new();
 
     println!("Please put in any green letters in their place.\n Put a _ for any placeholders");
@@ -54,7 +87,11 @@ fn expect_input() -> LettersManager{
     let mut letters = handle_input();
 
     while letters.len() != 5 {
-        println!("Input needs to be 5 letters. Length was {}: {}", letters.len(), letters);
+        println!(
+            "Input needs to be 5 letters. Length was {}: {}",
+            letters.len(),
+            letters
+        );
         letters = handle_input();
     }
 
@@ -78,7 +115,9 @@ fn expect_input() -> LettersManager{
 fn handle_input() -> String {
     let mut letters: String = String::new();
 
-    io::stdin().read_line(&mut letters).expect("Failed to read line");
+    io::stdin()
+        .read_line(&mut letters)
+        .expect("Failed to read line");
 
     letters.trim_end().to_string()
 }
